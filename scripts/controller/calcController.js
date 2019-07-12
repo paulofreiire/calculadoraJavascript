@@ -1,6 +1,6 @@
 class CalcController {
   constructor() {
-    this._operand = [];
+    this._operation = [];
     this._locale = "pt-BR";
     this._displayCalcEl = document.querySelector("#display");
     this._dateEl = document.querySelector("#data");
@@ -28,7 +28,7 @@ class CalcController {
     this.operand = [];
   }
   clearEntry() {
-    this._operand.pop();
+    this._operation.pop();
   }
 
   isOperator(value) {
@@ -36,21 +36,25 @@ class CalcController {
   }
 
   getLastOperand() {
-    return this._operand[this._operand.length - 1];
+    return this._operation[this._operation.length - 1];
   }
 
   setLastOperand(value) {
-    this._operand[this._operand.length - 1] = value;
+    this._operation[this._operation.length - 1] = value;
+  }
+
+  addOperator(value) {
+    this._operation.push(value);
   }
 
   addOperand(value) {
     if (isNaN(this.getLastOperand())) {
-      this._operand.push(value);
+      this._operation.push(value);
     } else {
       let newValue = this.getLastOperand().toString() + value.toString();
       this.setLastOperand(parseInt(newValue));
     }
-    console.log(this._operand);
+    console.log(this._operation);
   }
 
   setError() {
@@ -68,15 +72,19 @@ class CalcController {
         break;
 
       case "soma":
+        this.addOperator("+");
         break;
 
       case "subtracao":
+        this.addOperator("-");
         break;
 
       case "divisao":
+        this.addOperator("/");
         break;
 
       case "multiplicacao":
+        this.addOperator("*");
         break;
 
       case "porcento":
