@@ -1,5 +1,6 @@
 class CalcController {
   constructor() {
+    this._operand = [];
     this._locale = "pt-BR";
     this._displayCalcEl = document.querySelector("#display");
     this._dateEl = document.querySelector("#data");
@@ -23,12 +24,94 @@ class CalcController {
     });
   }
 
+  clearAll() {
+    this.operand = [];
+  }
+  clearEntry() {
+    this._operand.pop();
+  }
+
+  isOperator(value) {
+    return ["+", "-", "*", "%", "/"].indexOf(value) > -1;
+  }
+
+  getLastOperand() {
+    return this._operand[this._operand.length - 1];
+  }
+
+  setLastOperand(value) {
+    this._operand[this._operand.length - 1] = value;
+  }
+
+  addOperand(value) {
+    if (isNaN(this.getLastOperand())) {
+      this._operand.push(value);
+    } else {
+      let newValue = this.getLastOperand().toString() + value.toString();
+      this.setLastOperand(parseInt(newValue));
+    }
+    console.log(this._operand);
+  }
+
+  setError() {
+    this.displayCalc = "Error";
+  }
+
+  execBtn(value) {
+    switch (value) {
+      case "ac":
+        this.clearAll();
+        break;
+
+      case "ce":
+        this.clearEntry();
+        break;
+
+      case "soma":
+        break;
+
+      case "subtracao":
+        break;
+
+      case "divisao":
+        break;
+
+      case "multiplicacao":
+        break;
+
+      case "porcento":
+        break;
+
+      case "igual":
+        break;
+      case "ponto":
+        break;
+
+      case "0":
+      case "1":
+      case "2":
+      case "3":
+      case "4":
+      case "5":
+      case "6":
+      case "7":
+      case "8":
+      case "9":
+        this.addOperand(parseInt(value));
+        break;
+
+      default:
+        this.setError;
+    }
+  }
+
   initButtonEvents() {
     let buttons = document.querySelectorAll("#buttons > g, #parts > g");
 
     buttons.forEach((btn, index) => {
       this.addEventListenerAll(btn, "click drag", e => {
         let textBtn = btn.className.baseVal.replace("btn-", "");
+        this.execBtn(textBtn);
       });
 
       this.addEventListenerAll(btn, "mouseover mouseup mousedown", e => {
