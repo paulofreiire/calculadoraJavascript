@@ -35,26 +35,47 @@ class CalcController {
     return ["+", "-", "*", "%", "/"].indexOf(value) > -1;
   }
 
-  getLastOperand() {
+  getLastItem() {
     return this._operation[this._operation.length - 1];
   }
 
-  setLastOperand(value) {
+  setLastItem(value) {
     this._operation[this._operation.length - 1] = value;
   }
 
-  addOperator(value) {
+  pushOperation(value) {
     this._operation.push(value);
+    if (this._operation.length > 3) {
+      let last = this._operation.pop();
+      this.calc();
+    }
+  }
+
+  calc(){
+    let last = this._operation.pop;
+
+    let resul = eval(this._operation.join(""));
+
+    this._operation = [result, last];
+
+  }
+
+  addOperator(value) {
+    if (this.isOperator(this.getLastItem())) {
+      this.setLastItem(value);
+    } else {
+      this.pushOperation(value);
+    }
   }
 
   addOperand(value) {
-    if (isNaN(this.getLastOperand())) {
-      this._operation.push(value);
+    if (isNaN(this.getLastItem())) {
+      this.pushOperation(value);
+      console.log(this._operation);
     } else {
-      let newValue = this.getLastOperand().toString() + value.toString();
-      this.setLastOperand(parseInt(newValue));
+      let newValue = this.getLastItem().toString() + value.toString();
+      this.setLastItem(parseInt(newValue));
     }
-    console.log(this._operation);
   }
 
   setError() {
