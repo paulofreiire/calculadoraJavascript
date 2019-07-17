@@ -1,5 +1,9 @@
 class CalcController {
   constructor() {
+    this._lastOperand = "";
+    this._lastOperator = "";
+    this._result = "";
+    this._hasDot = false;
     this._operation = [];
     this._locale = "pt-BR";
     this._displayCalcEl = document.querySelector("#display");
@@ -30,6 +34,8 @@ class CalcController {
   }
   clearEntry() {
     this._operation.pop();
+    this._lastOperand = "";
+    this.displayCalc = "0";
   }
 
   isOperator(value) {
@@ -52,36 +58,79 @@ class CalcController {
   }
 
   calc() {
-    let last = this._operation.pop();
-    let result = eval(this._operation.join(""));
+    if (this._operation.length < 3) {
+      this._operation = [
+        this._operation[0],
+        this._lastOperator,
+        this._lastOperand
+      ];
+    }
 
-    this._operation = [result, last];
-    this.displayCalc = result;
+    if (this._operation.length === 3) {
+      this._result = eval(this._operation.join(""));
+      console.log(this._result);
+    }
+
+    if (this._operation.length > 3) {
+      this._operation.pop();
+      this._result = eval(this._operation.join(""));
+      this._lastOperand = eval(this._operation.join(""));
+    }
+
+    if (this._lastOperator === "%") {
+      this._operation = [(this._result /= 100)];
+    } else {
+      this._operation = [this._result.toString(), this._lastOperator];
+    }
+
+    this.displayCalc = this._result.toString().substring(0, 10);
   }
 
   addOperator(value) {
     if (this.isOperator(this.getLastItem())) {
+      this._lastOperator = value;
       this.setLastItem(value);
     } else {
       this.pushOperation(value);
+      this._lastOperator = value;
     }
-    //this.displayCalc = value;
-    //this.setError();
   }
 
   addOperand(value) {
     if (isNaN(this.getLastItem())) {
+      this._lastOperand = value;
       this.pushOperation(value);
     } else {
       let newValue = this.getLastItem().toString() + value.toString();
-      this.setLastItem(parseInt(newValue));
+      this.setLastItem(newValue);
+      this._lastOperand = newValue;
     }
-
-    this.displayCalc = this.getLastItem();
+    console.log(this._operation);
+    this.displayCalc = this._lastOperand.toString().substring(0, 10);
   }
 
   setError() {
     this.displayCalc = "Error";
+  }
+
+  addDot() {
+    if (
+      this.getLastItem &&
+      this.getLastItem()
+        .toString()
+        .split("")
+        .indexOf() > -1
+    )
+      return;
+
+    if (this.isOperator(this.getLastItem()) || !this.getLastItem()) {
+      this._lastOperand = "0.";
+      this.pushOperation(this._lastOperand);
+    } else {
+      this.setLastItem(this._lastOperand.toString() + ".");
+    }
+
+    this.displayCalc = this._lastOperand.toString().substring(0, 10);
   }
 
   initButtonEvents() {
@@ -163,11 +212,15 @@ class CalcController {
         break;
 
       case "porcento":
+        this.addOperator("%");
         break;
 
       case "igual":
+        this.calc();
+
         break;
       case "ponto":
+        this.addDot();
         break;
 
       case "0":
